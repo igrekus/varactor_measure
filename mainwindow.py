@@ -77,7 +77,7 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def on_measureComplete(self):
         print('meas complete')
-        # self._plotWidget.plot()
+        self._plotWidget.plot()
         self._statWidget.stats = self._instrumentController.result.stats
 
     @pyqtSlot()

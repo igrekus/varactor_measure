@@ -1,6 +1,10 @@
 import itertools
 
+import pyqtgraph as pg
+
 from PyQt5.QtWidgets import QGridLayout, QWidget
+from PyQt5.QtCore import Qt
+
 from mytools.plotwidget import PlotWidget
 
 
@@ -46,6 +50,48 @@ class PrimaryPlotWidget(QWidget):
         self._grid.addWidget(self._plotVswrIn, 0, 1)
         self._grid.addWidget(self._plotVswrOut, 1, 0)
 
+        self._testPlot = pg.PlotWidget()
+        self._grid.addWidget(self._testPlot, 1, 1)
+
+        # https://www.learnpyqt.com/tutorials/plotting-pyqtgraph/
+        # https://pyqtgraph.readthedocs.io/en/latest/introduction.html#what-is-pyqtgraph
+        # matplotlib colors ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+        self._testPlot.setBackground('w')
+        self._testPlot.plot(
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            [30, 32, 34, 32, 33, 31, 29, 32, 35, 45],
+            pen=pg.mkPen(
+                color='#1f77b4',
+                width=2,
+            ),
+            symbol='o',
+            symbolSize=5,
+            symbolBrush='#1f77b4',
+            name='test plot 1'
+        )
+        self._testPlot.plot(
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            [50, 35, 44, 22, 38, 32, 27, 38, 32, 44],
+            pen=pg.mkPen(
+                color='#ff7f0e',
+                width=2,
+            ),
+            symbol='o',
+            symbolSize=5,
+            symbolBrush='#ff7f0e',
+            name='test plot 2'
+        )
+        self._testPlot.setTitle('Test plot', color='k', size='13pt')
+        style = {'color': 'k', 'font-size': '15px'}
+        self._testPlot.setLabel('left', 'y-s', **style)
+        self._testPlot.setLabel('bottom', 'x-es', **style)
+
+        self._testPlot.setXRange(0, 11, padding=0)
+        self._testPlot.setYRange(20, 55, padding=0)
+
+        self._testPlot.addLegend()
+        self._testPlot.showGrid(x=True, y=True)
+
         self.setLayout(self._grid)
 
         self._init()
@@ -76,9 +122,6 @@ class PrimaryPlotWidget(QWidget):
         print('plotting primary stats')
         self.clear()
         self._init(dev_id)
-
-        for_states = self.main_states if self.only_main_states else range(64)
-        # for_states = range(len(self.main_states))
 
         freqs = self._result.freqs
         s21s = self._result.s21[:1]
