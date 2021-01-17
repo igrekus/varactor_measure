@@ -18,7 +18,7 @@ class InstrumentController(QObject):
         super().__init__(parent=parent)
 
         self.requiredInstruments = {
-            'Анализатор п/п приборов': SemiconductorAnalyzerFactory('GPIB0::9::INSTR'),
+            'Анализатор п/п приборов': SemiconductorAnalyzerFactory('GPIB1::10::INSTR'),
         }
 
         self.deviceParams = {
@@ -118,8 +118,64 @@ class InstrumentController(QObject):
     def _measure_s_params(self):
         sda = self._instruments['Анализатор п/п приборов']
 
-        res = sda.query('*IDN?')
-        print(res)
+        i = 0
+        j = 0
+        nop1 = 21
+        nop2 = 1
+        data = []
+        value ="Vg (V), Cp (pF), C_st, G (uS), G_st, OSC (mV), Osc_st, DC (V), Dc_st, Time (s)"
+        fname = "ex15.txt"
+        title = "CV Sweep Measurement Result"
+        msg = "No error."
+        err = "0"
+        freq = 1000000
+        ref_cp = 0
+        ref_g = 0
+        osc_level = 0.03
+        vg1 = 0
+        vg2 = 10
+        hold = 0
+        delay = 0
+        s_delay = 0
+        _range = 0
+        rep = nop1
+        sc = [0] * nop1
+        md = [0] * nop1 * 2
+        st = [0] * nop1 * 2
+        mon = [0] * nop1 * 2
+        st_mon = [0] * nop1 * 2
+        tm = [0] * nop1
+        ret_val = ''
+
+        sda.send("FMT 1,1")
+        sda.send("TSC 1")
+        sda.send("DV 5,0,0,0.1,0")
+
+        ch = 5   # slot number in which MFCMU device is set (B1520A)
+        sda.send(f"CN {ch}")
+        sda.send("SSP {ch],4")
+        sda.send("ACT 0, 2")
+        sda.send("WTDCV 0,0,0")
+        sda.send(f"WDCV {ch},1,{vg1},{vg2},{nop1}")
+        sda.send(f"MM 18,{ch}")
+        sda.send("IMP 100")
+        sda.send("LMN 1")
+        sda.send(f"RC {ch},{_range}")
+
+        time.sleep(3)
+        sda.send("TSR")
+        sda.send("XE")   # trigger measure
+
+        time.sleep(3)
+        rdy = sda.query('*OPC?')
+
+        res = sda.query('NUB?')
+
+        time.sleep(3)
+
+        res = sda._inst.read()
+
+        print('>>> result', res)
         return res
 
     def pow_sweep(self):
