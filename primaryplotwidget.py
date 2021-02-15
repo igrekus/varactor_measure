@@ -4,7 +4,7 @@ import pyqtgraph as pg
 
 from PyQt5.QtWidgets import QGridLayout, QWidget
 
-from mytools.plotwidget import PlotWidget
+from qttools.plotwidget import PlotWidget
 
 
 class PrimaryPlotWidget(QWidget):
